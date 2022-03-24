@@ -132,5 +132,5 @@ if __name__ == "__main__":
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
 
-    for image, trimap in zip(image_path, trimap_path, result_dir):
-        inference(image, trimap)
+    for image, trimap in zip(image_path, trimap_path):
+        inference(image, trimap, result_dir)
