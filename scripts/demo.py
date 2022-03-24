@@ -1,4 +1,6 @@
 
+from glob import glob
+from pathlib import Path
 import numpy as np
 import os
 import cv2 as cv
@@ -9,6 +11,8 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 from hlmobilenetv2 import hlmobilenetv2
+
+import argparse
 
 # ignore warnings
 import warnings
@@ -118,19 +122,15 @@ def inference(image_path, trimap_path):
 
 
 if __name__ == "__main__":
-    image_path = [
-        './examples/images/beach-747750_1280_2.png',
-        './examples/images/boy-1518482_1920_9.png',
-        './examples/images/light-bulb-1104515_1280_3.png',
-        './examples/images/spring-289527_1920_15.png',
-        './examples/images/wedding-dresses-1486260_1280_3.png'
-    ]
-    trimap_path = [
-        './examples/trimaps/beach-747750_1280_2.png',
-        './examples/trimaps/boy-1518482_1920_9.png',
-        './examples/trimaps/light-bulb-1104515_1280_3.png',
-        './examples/trimaps/spring-289527_1920_15.png',
-        './examples/trimaps/wedding-dresses-1486260_1280_3.png'
-    ]
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('dir', type=Path, default=Path('./examples'))
+
+    args = parser.parse_args()
+
+    dir = args.dir
+    image_path = sorted(glob(f'{dir}/images/*.*'))
+    trimap_path = sorted(glob(f'{dir}/trimaps/*.*'))
+
     for image, trimap in zip(image_path, trimap_path):
         inference(image, trimap)
