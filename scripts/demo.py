@@ -124,7 +124,7 @@ def inference(image_path, trimap_path):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('dir', type=Path, default=Path('./examples'))
+    parser.add_argument('--dir', type=Path, default=Path('./examples'))
 
     args = parser.parse_args()
 
