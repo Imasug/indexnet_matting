@@ -24,12 +24,8 @@ IMG_STD = np.array([0.229, 0.224, 0.225, 1]).reshape((1, 1, 4))
 
 STRIDE = 32
 RESTORE_FROM = './pretrained/indexnet_matting.pth.tar'
-RESULT_DIR = './examples/mattes'
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-if not os.path.exists(RESULT_DIR):
-    os.makedirs(RESULT_DIR)
 
 # load pretrained model
 net = hlmobilenetv2(
@@ -85,7 +81,7 @@ def image_alignment(x, output_stride, odd=False):
 
     return new_x
 
-def inference(image_path, trimap_path):
+def inference(image_path, trimap_path, result_dir):
     with torch.no_grad():
         image, trimap = read_image(image_path), read_image(trimap_path)
         trimap = np.expand_dims(trimap, axis=2)
@@ -114,7 +110,7 @@ def inference(image_path, trimap_path):
         alpha = (1 - mask) * trimap + mask * alpha
 
         _, image_name = os.path.split(image_path)
-        Image.fromarray(alpha.astype(np.uint8)).save(os.path.join(RESULT_DIR, image_name))
+        Image.fromarray(alpha.astype(np.uint8)).save(os.path.join(result_dir, image_name))
         # Image.fromarray(alpha.astype(np.uint8)).show()
 
         running_frame_rate = 1 * float(1 / (end - start)) # batch_size = 1
@@ -131,6 +127,10 @@ if __name__ == "__main__":
     dir = args.dir
     image_path = sorted(glob(f'{dir}/images/*.*'))
     trimap_path = sorted(glob(f'{dir}/trimaps/*.*'))
+    result_dir = f'{dir}/mattes'
 
-    for image, trimap in zip(image_path, trimap_path):
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+
+    for image, trimap in zip(image_path, trimap_path, result_dir):
         inference(image, trimap)
